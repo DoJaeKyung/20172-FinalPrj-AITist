@@ -1,0 +1,162 @@
+import processing.serial.*;
+
+Serial myPort;        // The serial port
+
+int[] val = new int[128];
+int colorByAmplitude;
+
+int howMany = 400;
+float[] x = new float[howMany];
+float[] y = new float[howMany];
+float[] speed = new float[howMany];
+ 
+void setup() {
+  size(200, 800);
+  background(255,248,21);
+  myPort = new Serial(this, "/dev/cu.usbmodem1421", 9600);
+  // don't generate a serialEvent() unless you get a newline character:
+  myPort.bufferUntil('\n');  
+
+  noStroke();
+  smooth();
+ 
+  int i = 0;
+  while (i<howMany) { 
+    x[i] = random(0, width);
+    y[i] = random(0, height);
+    speed[i] = random(1,5);
+    i +=1;
+  }
+}
+
+void draw() {
+
+  fill(188,27,247,3);
+  rect(0,0,width, height);
+ 
+  int i = 0;
+  int count=0;
+  while (i < howMany) {
+    
+    //if(count % 5 ==0)
+      fill(colorByAmplitude,80*speed[i]);
+    //else
+    //  fill(10,182,203,80*speed[i]);
+    ellipse(x[i], y[i],speed[i],speed[i]);
+    y[i] += speed[i]/4;
+    if (y[i] > height) {
+      y[i] = 0;
+    }
+    count++;
+    i +=1;
+  }
+}
+
+void serialEvent (Serial myPort) {
+  try{
+      byte[] inByte = new byte[200];
+      myPort.readBytesUntil('\n',inByte);
+      
+        // convert to an int and map to the screen height:
+        for(int i = 0; i<128; i++){
+         val[i] = int(inByte[i]);
+         if(val[i] > 155 && val[i+1] > 155 && val[i+1] > 155 && i < 126 && i !=0 )
+         {
+           print(i*390);
+           print('\t');
+           print(val[i]);
+           print('\t');
+           print("Changed : ");
+           print((i*390*2/45)+380);
+           // amplitude to color
+           print('\n');
+           colorByAmplitude = setColor((i*390*2/45)+380);
+            
+           //print(hex(32,2));
+           //print('\n');
+         }
+        }
+        redraw();
+
+  }catch(Exception e){
+    println("Err");
+  }
+}
+
+int setColor(int inputValue) // Dan Bruton's Wavelength to RGB mapping method
+{
+  
+  int waveLength, result;
+  double R = 0, G = 0, B = 0, gamma = 0.8, r, attenuation;
+  String hexNum, c;
+  
+  waveLength = inputValue; // getValue from serialEvent
+
+  r = random(0, 111);
+  if (waveLength < 380 || waveLength > 780){
+    
+  } else if (waveLength < 440 && waveLength >= 380){ 
+    attenuation = 0.3 + (0.7*(waveLength-380)/(440-380));
+    
+    //randomSeed(111);
+    R = pow((float)((-(float)(waveLength - 440)/(440 - 380)) * attenuation), (float)gamma);
+    G = r;
+    B = pow((float)(1.0 * attenuation), (float)gamma);
+  } else if (waveLength < 490 && waveLength >= 440){
+    //randomSeed(111);
+    
+    R = r;
+    G = pow((float)(waveLength-440)/(490-440), (float)gamma); 
+    B = 1; 
+  } else if (waveLength < 510 && waveLength >= 490){
+    //randomSeed(111);
+    
+    R = r; 
+    G = 1; 
+    B = pow((float)(-(float)(waveLength - 510) / (510 - 490)), (float)gamma);
+  } else if (waveLength <= 580 && waveLength > 510){
+    R = pow((float)((float)(waveLength - 510)/(580 - 510)), (float)gamma); 
+    G = 1; 
+    B = r;
+  } else if (waveLength <= 645 && waveLength > 580){    
+    R = 1; 
+    G = pow((float)(-(float)(waveLength - 645)/(645 - 580)), (float)gamma);
+    B = r;
+  } else if (waveLength > 645 && waveLength <= 750){
+    attenuation = 0.3 + (0.7*(float)(750 - waveLength)/(750 - 645));
+    
+    R = pow((float)(1.0 * attenuation), (float)gamma);
+    G = r;
+    B = r;
+  } else { 
+    R = 0; 
+    G = 0; 
+    B = 0; 
+  }
+  
+  hexNum = "#" + toHex(R) + toHex(G) + toHex(B);
+  hexNum = "FF" + hexNum.substring(1);
+  print(hexNum);
+  print('\t');
+  result = unhex(hexNum);
+  print(result);
+  print('\n');
+  
+  return result;
+}
+
+String toHex(double x) {
+  int value;
+  String result;
+  
+  // random interval : 0 - 144
+  if(x < 1){
+    x = Math.floor(x*255);
+  }
+
+  value = (int)x;
+
+  result = hex(value, 2);
+  
+  return result;
+}
