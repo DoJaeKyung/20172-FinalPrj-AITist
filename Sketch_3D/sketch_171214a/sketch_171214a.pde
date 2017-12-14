@@ -68,7 +68,7 @@ void draw(){
     shp(z,x,y,sz);
 
     }}}
-
+    saveFrame();
 
   } // end loop
 

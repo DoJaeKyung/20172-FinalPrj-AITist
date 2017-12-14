@@ -10,7 +10,7 @@ float[] y = new float[howMany];
 float[] speed = new float[howMany];
  
 void setup() {
-  size(200, 800);
+  size(400, 700);
   background(255,248,21);
   myPort = new Serial(this, "COM3", 9600);
   // don't generate a serialEvent() unless you get a newline character:
@@ -48,12 +48,14 @@ void draw() {
     count++;
     i +=1;
   }
+  saveFrame("line_######.jpg");
 }
+
 
 
 void serialEvent (Serial myPort) {
   try{
-      byte[] inByte = new byte[200];
+      byte[] inByte = new byte[400];
       myPort.readBytesUntil('\n',inByte);
       
         // convert to an int and map to the screen height:
@@ -61,10 +63,20 @@ void serialEvent (Serial myPort) {
          val[i] = int(inByte[i]);
          if(val[i] > 155 && val[i+1] > 155 && val[i+1] > 155 && i < 126 && i !=0 )
          {
-            colorByAmplitude = setColor((i*390*2/45)+380);
+           print(i*390);
+           print('\t');
+           print(val[i]);
+           print('\t');
+           print("Changed : ");
+           print((i*390*2/45)+380);
+           // amplitude to color
+           print('\n');
+           colorByAmplitude = setColor((i*390*2/45)+380);
+            
+           //print(hex(32,2));
+           //print('\n');
          }
         }
-       
         redraw();
 
   }catch(Exception e){
@@ -74,60 +86,62 @@ void serialEvent (Serial myPort) {
 
 int setColor(int inputValue) // Dan Bruton's Wavelength to RGB mapping method
 {
+  
   int waveLength, result;
-  double R = 0, G = 0, B = 0, c;
+  double R = 0, G = 0, B = 0, gamma = 0.8, r, attenuation;
   String hexNum;
   
   waveLength = inputValue; // getValue from serialEvent
-  
-  if (waveLength < 380 || waveLength > 780){ 
-    //get.value = "Wrong range! (380~780 nm) must be wavelength range";  
-  } else if (waveLength < 440){ 
-    R = (440-waveLength)/(440-380); 
-    G = 0; 
-    B = 1; 
-  } else if (waveLength < 490){ 
-    R = 0; 
-    G = (waveLength-440)/(490-440); 
-    B = 1; 
-  } else if (waveLength < 510){ 
-    R = 0; 
-    G = 1; 
-    B = (510-waveLength)/(510-490); 
-  } else if (waveLength < 580){ 
-    R = (waveLength-510)/(580-510); 
-    G = 1; 
-    B = 0; 
-  } else if (waveLength < 645){ 
-    R = 1; 
-    G = (645-waveLength)/(645-580); 
-    B = 0; 
-  } else { 
-    /* (waveLength <=780) */ 
-    R = 1; 
-    G = 0; 
-    B = 0; 
-  }
 
-  if (waveLength > 700){ 
-    c = 0.3 + (0.7*((780-waveLength)/80)); 
-    R *= c; 
-    G *= c; 
-    B *= c;
+  r = random(0, 111);
+  if (waveLength < 380 || waveLength > 780){
+    
+  } else if (waveLength < 440 && waveLength >= 380){ 
+    attenuation = 0.3 + (0.7*(waveLength-380)/(440-380));
+    
+    //randomSeed(111);
+    R = pow((float)((-(float)(waveLength - 440)/(440 - 380)) * attenuation), (float)gamma);
+    G = r;
+    B = pow((float)(1.0 * attenuation), (float)gamma);
+  } else if (waveLength < 490 && waveLength >= 440){
+    
+    R = r;
+    G = pow((float)(waveLength-440)/(490-440), (float)gamma); 
+    B = 1; 
+  } else if (waveLength < 510 && waveLength >= 490){
+    //randomSeed(111);
+    
+    R = r; 
+    G = 1; 
+    B = pow((float)(-(float)(waveLength - 510) / (510 - 490)), (float)gamma);
+  } else if (waveLength <= 580 && waveLength > 510){
+    R = pow((float)((float)(waveLength - 510)/(580 - 510)), (float)gamma); 
+    G = 1; 
+    B = r;
+  } else if (waveLength <= 645 && waveLength > 580){    
+    R = 1; 
+    G = pow((float)(-(float)(waveLength - 645)/(645 - 580)), (float)gamma);
+    B = r;
+  } else if (waveLength > 645 && waveLength <= 750){
+    attenuation = 0.3 + (0.7*(float)(750 - waveLength)/(750 - 645));
+    
+    R = pow((float)(1.0 * attenuation), (float)gamma);
+    G = r;
+    B = r;
+  } else { 
+    R = 0; 
+    G = 0; 
+    B = 0; 
   }
   
-  if (waveLength < 420){ 
-    c = 0.3 + (0.7*((waveLength-380)/40)); 
-    R *= c; 
-    G *= c; 
-    B *= c;
-  }
-  
-  hexNum = toHex(R) + toHex(G) + toHex(B);
+  hexNum = "#" + toHex(R) + toHex(G) + toHex(B);
+  hexNum = "FF" + hexNum.substring(1);
   print(hexNum);
+  print('\t');
+  result = unhex(hexNum);
+  print(result);
   print('\n');
   
-  result = unhex(hexNum);
   return result;
 }
 
@@ -135,8 +149,13 @@ String toHex(double x) {
   int value;
   String result;
   
-  x = Math.floor(x*255);
+  // random interval : 0 - 144
+  if(x < 1){
+    x = Math.floor(x*255);
+  }
+
   value = (int)x;
+
   result = hex(value, 2);
   
   return result;

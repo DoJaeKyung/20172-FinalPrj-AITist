@@ -39,6 +39,7 @@ void draw() {
     }    
     endShape();
   }
+  saveFrame("line-######.jpg");
   
 }
 
