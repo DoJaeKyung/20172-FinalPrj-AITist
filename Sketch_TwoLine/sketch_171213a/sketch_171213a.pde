@@ -105,14 +105,12 @@ int setColor(int inputValue) // Dan Bruton's Wavelength to RGB mapping method
     G = r;
     B = pow((float)(1.0 * attenuation), (float)gamma);
   } else if (waveLength < 490 && waveLength >= 440){
-    //randomSeed(111);
     
     R = r;
     G = pow((float)(waveLength-440)/(490-440), (float)gamma); 
     B = 1; 
   } else if (waveLength < 510 && waveLength >= 490){
-    //randomSeed(111);
-    
+ 
     R = r; 
     G = 1; 
     B = pow((float)(-(float)(waveLength - 510) / (510 - 490)), (float)gamma);
@@ -147,7 +145,7 @@ int setColor(int inputValue) // Dan Bruton's Wavelength to RGB mapping method
   return result;
 }
 
-String toHex(double x) {
+String toHex(double x) { //RGB 값을 String형태의 16진수로 변환
   int value;
   String result;
   
