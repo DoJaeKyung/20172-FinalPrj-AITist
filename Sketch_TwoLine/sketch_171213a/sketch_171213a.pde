@@ -100,7 +100,6 @@ int setColor(int inputValue) // Dan Bruton's Wavelength to RGB mapping method
   } else if (waveLength < 440 && waveLength >= 380){ 
     attenuation = 0.3 + (0.7*(waveLength-380)/(440-380));
     
-    //randomSeed(111);
     R = pow((float)((-(float)(waveLength - 440)/(440 - 380)) * attenuation), (float)gamma);
     G = r;
     B = pow((float)(1.0 * attenuation), (float)gamma);
