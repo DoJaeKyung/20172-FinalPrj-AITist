@@ -36,10 +36,13 @@ void draw(){
   background(60);
   translate(width / 2, height / 2);
   for(float radious = 250; radious > 0; radious -= 10){
+  //주파수의 RGB값 중 R,G,B값을 각각 도출해서 색상 적용
+  //red()->RGB값 중 R값 추출, green()->RGB값 중 G값 추출, blue()->RGB값 중 B값 추출
     fill(map(radious, 0, 250, red(colorByAmplitude), red(0)),
          map(radious, 0, 250, green(colorByAmplitude), green(0)),
          map(radious, 0, 250, blue(colorByAmplitude), blue(0)));
     beginShape();
+    //Wave의 형태모양 적용
     for(float angle = 0; angle < 360; angle += 0.5){
       float radian = radians(angle);  
       float x = radious * cos(radian);
