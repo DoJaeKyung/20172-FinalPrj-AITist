@@ -31,25 +31,27 @@ void draw(){
   t = (float)frameCount/maxFrameCount;
   theta = TWO_PI*t;
 
-  // lights
+  //기본적인 빛 설정
   directionalLight(245, 245, 245, 300, -200, -200);  
   ambientLight(240, 240, 240); 
   
-  // rotate the whole cube
+  //큐브의 회전 각도 설정
   rotateY(radians(145));
   rotateX(radians(45));
   
-// 3 nested for loops to create sides  
+//3개의 포문을 통해 x,y,z 측면 설계
   for (int x = -space; x <= space; x += 20) {
   for (int y = -space; y <= space; y += 20) {
   for (int z = -space; z <= space; z += 200) {
 
-    // map size of small cubes with offset
+    //큐브속의 작은 큐브 사이즈 설정
     float offSet = ((x*y*z))/a;
     float sz = map(sin(-theta+offSet), -1, 1, -0, 20);
 /*
     color c1 = color(240,40,100);
     color c2 = color(40,40,90);*/
+    
+    //주파수에 따라 컬러 입힘
     color c1 = color(colorByAmplitude);
     color c2 = color(40,40,90);
 
@@ -62,7 +64,7 @@ void draw(){
     stroke(c1);
   }
     
-    // small blocks, 3 times to create cube
+    //작은 사이즈의 큐브 생성
     shp(x,y,z,sz);
     shp(y,z,x,sz);
     shp(z,x,y,sz);
@@ -70,7 +72,7 @@ void draw(){
     }}}
 
 
-  } // end loop
+  } //큐브 생성 끝
 
   void shp(float x, float y,  float z, float d){
     
