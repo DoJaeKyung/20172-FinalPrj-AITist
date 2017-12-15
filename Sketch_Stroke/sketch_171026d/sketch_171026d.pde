@@ -119,11 +119,15 @@ void mousePressed() {
 ////////////////
 void serialEvent (Serial myPort) {
   try{
-      byte[] inByte = new byte[200];
+  //아두이노의 센서값을 Byte단위로 넘겨 받음.
+      byte[] inByte = new byte[400];
       myPort.readBytesUntil('\n',inByte);
         // convert to an int and map to the screen height:
         for(int i = 0; i<128; i++){
+         //val[i]에 넘겨 받은 센서값을 저장
          val[i] = int(inByte[i]);
+         //잡음을 제외한 주파수 측정. 일정 수준 이상의 주파수가 연속적으로 측정되었을때 
+         //그것을 잡음을 제외한 우리가 측정하고자 하는 주파수라고 생각.  
          if(val[i] > 155 && val[i+1] > 155 && val[i+1] > 155 && i < 126 && i !=0 )
          {
             colorByAmplitude = setColor((i*390*2/45)+380);
@@ -137,14 +141,14 @@ void serialEvent (Serial myPort) {
   }
 }
 
-int setColor(int inputValue) // Dan Bruton's Wavelength to RGB mapping method
+int setColor(int inputValue) // 파장에서 RGB를 매칭시키는 함수. 'Dan Bruton'의 매핑 함수 참고
 {
   int waveLength, result;
   double R = 0, G = 0, B = 0, c;
   String hexNum;
   
   waveLength = inputValue; // getValue from serialEvent
-  
+  //파장을 380-780사이로 측정. 에러검출
   if (waveLength < 380 || waveLength > 780){ 
     //get.value = "Wrong range! (380~780 nm) must be wavelength range";  
   } else if (waveLength < 440){ 
@@ -187,7 +191,9 @@ int setColor(int inputValue) // Dan Bruton's Wavelength to RGB mapping method
     G *= c; 
     B *= c;
   }
-  
+  //측정한 RGB값을 16진수로 나타냄
+  //그 후 각각의 값을 더함
+  //##172346,이런식으로 표현하기 위함
   hexNum = toHex(R) + toHex(G) + toHex(B);
   print(hexNum);
   print('\n');
@@ -195,7 +201,7 @@ int setColor(int inputValue) // Dan Bruton's Wavelength to RGB mapping method
   result = unhex(hexNum);
   return result;
 }
-
+//16진수 변환 함수
 String toHex(double x) {
   int value;
   String result;
