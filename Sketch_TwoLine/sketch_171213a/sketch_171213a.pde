@@ -133,11 +133,11 @@ int setColor(int inputValue) // Dan Bruton's Wavelength to RGB mapping method
     B = 0; 
   }
   
-  hexNum = "#" + toHex(R) + toHex(G) + toHex(B);
-  hexNum = "FF" + hexNum.substring(1);
+  hexNum = "#" + toHex(R) + toHex(G) + toHex(B); 
+  hexNum = "FF" + hexNum.substring(1); //계산한 RGB 값을 String형태의 16진수로 변환한다.
   print(hexNum);
   print('\t');
-  result = unhex(hexNum);
+  result = unhex(hexNum); //String 형태의 16진수값을 10진수의 int 값으로 변환한다
   print(result);
   print('\n');
   
