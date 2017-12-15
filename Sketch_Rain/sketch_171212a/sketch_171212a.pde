@@ -37,6 +37,7 @@ void draw() {
   int count=0;
   while (i < howMany) {
     if(count % 5 ==0)
+    // 주파수에 따른 색깔 입히기
       fill(colorByAmplitude,80*speed[i]);
     else
       fill(10,182,203,80*speed[i]);
